@@ -1,0 +1,55 @@
+{% extends 'base.html' %} {% block head %}
+
+<form id="form" action="/" method="post" enctype="multipart/form-data">
+  <div class="main">
+    <label for="input-file" id="drop-area">
+      <input name="file" type="file" accept="video/*" id="input-file" hidden />
+      <div id="img-view">
+        <img src="{{ url_for('static', filename='upload.png') }}" />
+        <p>Drag and Drop <div>or</div> <div class="text-line">Click here to upload video</div></p>
+      </div>
+    </label>
+
+    <div class="options">
+      <div class="language-selection">
+        <div class="select-lang">
+          <label for="lang">Choose a language:</label>
+          <select name="lang" id="lang">
+            <option value="hide">-- Select Lang. --</option>
+            <option value="pa-IN">Punjabi</option>
+            <option value="te-IN">Telugu</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ta-IN">Tamil</option>
+            <option value="mr-IN">Marathi</option>
+            <option value="bn-IN">Bengali</option>
+            <option value="gu-IN">Gujarati</option>
+          </select> 
+        </div>
+        
+        <!-- <div class="select-lang">
+          <label for="lang">Type:</label>
+          <select name="voice" id="lang-2">
+            <option value="hide">-- Select Voice --</option>
+            <option value="A">Female</option>
+            <option value="B">Male</option>
+          </select>  -->
+        <!-- </div> -->
+
+        <div class="text-super">
+          <input type="checkbox" id="super" name="super" value="True">
+          <label for="super">Select if the video contain <br>text supers</label>
+        </div>
+        <button value="Submit" id="upload">Upload</button>
+      </div>
+  </div>
+</form>
+</div>
+
+<script>
+  document.querySelector("form").addEventListener("submit", () => loading());
+  function loading() {
+    document.getElementById("preload").classList.add("loading");
+  }
+</script>
+
+{% endblock %}
