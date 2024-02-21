@@ -1,4 +1,4 @@
 import subprocess
 
-def generate_final(source_path):
-  subprocess.call(['ffmpeg', '-i', source_path, '-vf', 'subtitles=static/outdir/output.srt', 'static/outdir/video_with_subtitles.mp4'])
+def generate_final(source_path, trans):
+  subprocess.call(['ffmpeg', '-i', source_path, '-vf', 'subtitles=static/outdir/output.srt', f'static/outdir/{trans}.mp4'])

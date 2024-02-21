@@ -1,6 +1,8 @@
 from pydub import AudioSegment
 from google.cloud import texttospeech
-from google.cloud import translate_v2 as translate
+# from google.cloud import translate_v2 as translate
+from googletrans import Translator
+# from gtts import gTTS
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip
 from moviepy.video.tools.subtitles import SubtitlesClip, TextClip
 from typing import NamedTuple, List, Optional, Sequence
@@ -78,7 +80,6 @@ def extract_speaker_sentence(words, audioPath):
 
     speakerGender = {}
     for i, word in enumerate(words):
-        print("hii")
         wordText = word.word
         if not sentence:
             sentence = {
@@ -106,7 +107,7 @@ def extract_speaker_sentence(words, audioPath):
             sentence['text'].append(wordText)
             sentence['end_time'] = word.end_sec           
 
-        if i+1 < len(words) and word.end_sec - words[i+1].start_sec > 1.0:
+        if i+1 < len(words) and words[i+1].start_sec - word.end_sec > 1.0:
             if not sentence['speaker'] in speakerGender:
                 path = generate_audio_path(sentence['start_time'], sentence['end_time'], audioPath)
                 speakerGender[sentence['speaker']] = predict_gender(path)
@@ -183,10 +184,11 @@ def extract_sentences_from_srt(srtFilePath):
     return sentences, audio_splits, durations
 
 def translate_text(input, targetLang):
-    translate_client = translate.Client()
-    result = translate_client.translate(input, target_language=targetLang, source_language="en")
-
-    return result['translatedText']
+    target = targetLang.split("-")[0]
+    translater = Translator()
+    out = translater.translate(input, dest=target)
+    print(out.text)
+    return out.text
 
 
 def speak(text, languageCode, speakerGender, speakingRate=1):
@@ -215,7 +217,6 @@ def speak(text, languageCode, speakerGender, speakingRate=1):
     )
     return response.audio_content
 
-
 def text_to_speech(text, languageCode, durationSecs, gender):
     def find_duration(audio):
         file = tempfile.NamedTemporaryFile(mode="w+b")
@@ -228,7 +229,7 @@ def text_to_speech(text, languageCode, durationSecs, gender):
     baseAudio = speak(text, languageCode, gender)
     assert len(baseAudio)
 
-    min_rate, max_rate = 0.1, 4
+    min_rate, max_rate = 0.25, 4
     currentDuration = find_duration(baseAudio)
 
     for i in range(2):
@@ -240,6 +241,7 @@ def text_to_speech(text, languageCode, durationSecs, gender):
 
         ratio = currentDuration / durationSecs
         ratio = min(max(ratio, min_rate), max_rate)
+        print(ratio)
 
         baseAudio = speak(text, languageCode, gender, speakingRate=ratio)
     

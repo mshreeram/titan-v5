@@ -41,11 +41,11 @@ dropArea.addEventListener("drop", (e) => {
 });
 
 upload.addEventListener("click", (e) => {
-  if (!inputFile.files[0]) {
-    alert("Please upload or select a video first");
-    e.preventDefault();
-    return;
-  }
+  // if (!inputFile.files[0]) {
+  //   alert("Please upload or select a video first");
+  //   e.preventDefault();
+  //   return;
+  // }
   if (lang.value === "hide") {
     alert("Please select a language");
     e.preventDefault();

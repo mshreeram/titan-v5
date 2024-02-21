@@ -38,6 +38,6 @@ def text_super(video_path, baseName, translate_lang):
       break
 
   create_srt_file(subtitles, "static/outdir/output.srt")
-  generate_final(f"static/outdir/dubbedVideos/{baseName}[{translate_lang}].mp4")
+  generate_final(f"static/outdir/dubbedVideos/{baseName}[{translate_lang}].mp4", translate_lang)
   cam.release()
   cv2.destroyAllWindows()
