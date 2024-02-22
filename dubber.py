@@ -218,12 +218,20 @@ def speak(text, languageCode, speakerGender, speakingRate=1):
     return response.audio_content
 
 def text_to_speech(text, languageCode, durationSecs, gender):
+    temDirPath = f"static/outdir/temp"
+    if(not os.path.exists(temDirPath)):
+        os.mkdir(temDirPath)
+
     def find_duration(audio):
-        file = tempfile.NamedTemporaryFile(mode="w+b")
-        file.write(audio)
-        file.flush()
-        duration = AudioSegment.from_mp3(file.name).duration_seconds
-        file.close()
+        # file = tempfile.NamedTemporaryFile(mode="w+b")
+        # file.write(audio)
+        # file.flush()
+        # duration = AudioSegment.from_mp3(file.name).duration_seconds
+        # file.close()
+        with open(f"{temDirPath}/temp.mp3", 'wb') as f: 
+                f.write(audio)
+        duration = AudioSegment.from_mp3(f"{temDirPath}/temp.mp3").duration_seconds
+        os.remove(f"{temDirPath}/temp.mp3")
         return duration
 
     baseAudio = speak(text, languageCode, gender)
@@ -250,6 +258,8 @@ def text_to_speech(text, languageCode, durationSecs, gender):
 def merge_audio(sentences, audioDir, videoPath, outputPath, lags, currentDurations):
     audioFiles = os.listdir(audioDir)
     audioFiles.sort(key=lambda x: int(x.split('.')[0]))
+    tempDirPath = "static/outdir/temp"
+    
 
     segments = [AudioSegment.from_mp3(os.path.join(audioDir, x)) for x in audioFiles]
     dubbed = AudioSegment.from_file(videoPath)
@@ -263,16 +273,19 @@ def merge_audio(sentences, audioDir, videoPath, outputPath, lags, currentDuratio
             dubbed = dubbed.overlay(emptyLag, position=sentence['start_time']+duration, gain_during_overlay = -50)
         
 
-    audioFile = tempfile.NamedTemporaryFile()
-    dubbed.export(audioFile)
-    audioFile.flush()
+    # audioFile = tempfile.NamedTemporaryFile()
+    tempFilePath = f"{tempDirPath}/temp.mp4"
+    dubbed.export(tempFilePath, format="mp4")
+    
+    # dubbed.export(audioFile)
+    # audioFile.flush()
 
     clip = VideoFileClip(videoPath)
-    audio = AudioFileClip(audioFile.name)
+    audio = AudioFileClip(tempFilePath)
     clip = clip.set_audio(audio)
 
     clip.write_videofile(outputPath, codec='libx264', audio_codec='aac')
-    audioFile.close()
+    os.remove(tempFilePath)
 
 def dub(videoPath, outputDir, srcLang, targetLangs=[], speakerCount=1, genAudio=False):
 
